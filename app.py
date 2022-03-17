@@ -110,10 +110,10 @@ def render_signup_page():
         password2 = request.form.get('password2')
 
         if password != password2:
-            return redirect('signup.html?error=Passwords+do+not+match')
+            return redirect('signup?error=Passwords+do+not+match')
 
         if len(password) < 8:
-            return redirect('signup.html>error=Password+must+be+8+characters+or+more')
+            return redirect('signup?error=Password+must+be+8+characters+or+more')
 
         hashed_password = bcrypt.generate_password_hash(password)
         con = create_connection(DATABASE)
@@ -129,11 +129,11 @@ def render_signup_page():
         con.close()
         return redirect('/login')
 
-    # error = request.args.get('error')
-    # if error == None:
-    # error
+    error = request.args.get('error')
+    if error is None:
+        error = ""
 
-    return render_template('signup.html', logged_in=is_logged_in())
+    return render_template('signup.html', error=error, logged_in=is_logged_in())
 
 
 app.run(host='0.0.0.0', debug=True)
