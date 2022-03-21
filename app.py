@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, session
 import sqlite3
 from sqlite3 import Error
 from flask_bcrypt import Bcrypt
+from datetime import datetime
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
@@ -44,13 +45,34 @@ def render_homepage():
 def render_menu_page():
     con = create_connection(DATABASE)
 
-    query = "SELECT name, description, volume, price, image FROM product"
+    query = "SELECT name, description, volume, price, image, id FROM product"
     cur = con.cursor()  # Creates a cursor to write the query
     cur.execute(query)  # Runs the query
     product_list = cur.fetchall()
     con.close()
 
     return render_template('menu.html', products=product_list, logged_in=is_logged_in())
+
+
+@app.route('/addtocart/<product_id>')
+def render_addtocart_page(product_id):
+    try:
+        product_id = int(product_id)
+    except ValueError:
+        print("{} is not an integer".format(product_id))
+        return redirect(request.referrer + "?error=Invalid+product+id")
+
+    userid = session['customer_id']
+    timestamp = datetime.now()
+    print("Add {} to cart".format(product_id))
+
+    query = "INSERT INTO cart(id,customerid,productid,timestamp) VALUES (NULL,?,?,?)"
+    con = create_connection(DATABASE)
+    cur = con.cursor()
+    cur.execute(query, (userid, product_id, timestamp))
+    con.commit()
+    con.close()
+    return redirect(request.referrer)
 
 
 @app.route('/contact')
@@ -68,7 +90,7 @@ def render_login_page():
         con = create_connection(DATABASE)
         query = "SELECT id, fname, password FROM customer WHERE email=?"
         cur = con.cursor()
-        cur.execute(query, (email, ))
+        cur.execute(query, (email,))
         user_data = cur.fetchall()
         con.close()
 
@@ -84,7 +106,7 @@ def render_login_page():
             return redirect("/login?error=Email+or+password+is+incorrect")
 
         session['email'] = email
-        session['user_id'] = user_id
+        session['customer_id'] = user_id
         session['fname'] = first_name
         session['cart'] = []
         return redirect('/')
