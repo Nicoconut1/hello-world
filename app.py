@@ -75,6 +75,31 @@ def render_addtocart_page(product_id):
     return redirect(request.referrer)
 
 
+@app.route('/cart')
+def render_cart_page():
+    if not is_logged_in():
+        return redirect('/menu')
+    else:
+        customer_id = session['customer_id']
+        query = "SELECT productid FROM cart WHERE customerid=?;"
+        con = create_connection(DATABASE)
+        cur = con.cursor()
+        cur.execute(query, (customer_id, ))
+        product_ids = cur.fetchall()
+
+        print(product_ids)
+        for i in range(len(product_ids)):
+            product_ids[i] = product_ids[i][0]
+        print(product_ids)
+        unique_product_ids = list(set(product_ids))
+        print(unique_product_ids)
+        unique_product_ids.sort()
+        for i in range(len(unique_product_ids)):
+            product_count = product_ids.count(unique_product_ids[i])
+            unique_product_ids[i] = [unique_product_ids[i], product_count]
+            print()
+
+
 @app.route('/contact')
 def render_contact_page():
     return render_template('contact.html', logged_in=is_logged_in())

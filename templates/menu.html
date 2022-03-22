@@ -5,7 +5,7 @@ menu
 {% endblock %}
 
 {% block main %}
-{% if logged_in %}<p>Welcome {{ fname }}. Are you ready to order</p><br>{% endif %}
+{% if logged_in %}<p>Welcome, {{ fname }}. Are you ready to order?</p><br>{% endif %}
 <div class="products">
 {% for product in products %}
     <div class="product-box">
