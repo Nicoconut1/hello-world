@@ -87,17 +87,30 @@ def render_cart_page():
         cur.execute(query, (customer_id, ))
         product_ids = cur.fetchall()
 
-        print(product_ids)
+        # the results from the query are a list of sets, loop through and pull out the ids
         for i in range(len(product_ids)):
             product_ids[i] = product_ids[i][0]
-        print(product_ids)
+
         unique_product_ids = list(set(product_ids))
-        print(unique_product_ids)
+
         unique_product_ids.sort()
         for i in range(len(unique_product_ids)):
             product_count = product_ids.count(unique_product_ids[i])
             unique_product_ids[i] = [unique_product_ids[i], product_count]
-            print()
+        total = 0
+        query = "SELECT name, price FROM product WHERE id = ?;"
+        for item in unique_product_ids:
+            cur.execute(query, (item[0],))
+            item_details = cur.fetchall()
+            item.append(item_details[0][0])
+            item.append(item_details[0][1])
+
+        query = "DELETE FROM cart where userid=?;"
+        cur.execute(query, (userid,))
+        con.commit()
+        con.close()
+        send_confirmation(unique_product_ids)
+        return redirect('/?message=Order+complete')
 
 
 @app.route('/contact')
