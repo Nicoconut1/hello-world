@@ -7,11 +7,11 @@
     <table class="cart-table">
         <thead>
             <tr>
-                    <td>Name</td>
-                    <td>Quantity</td>
-                    <td>Prices</td>
-                    <td>Item Total<td>
-                    <td>Remove one</td>
+                <td>Name</td>
+                <td>Quantity</td>
+                <td>Prices</td>
+                <td>Item Total<td>
+                <td>Remove one</td>
             </tr>
         </thead>
         <tbody>
@@ -19,9 +19,9 @@
             <tr>
                 <td>{{ item[2] }}</td>
                 <td>{{ item[1] }}</td>
-                <td>{{ "{:.2f}".format(item[3]) }} %}</td>
-                <td>{{ "{:.2f}".format(item[4]) }} %}</td>
-                <td><a href="removeonefromcart/{{ item[0] }}"</td>
+                <td>{{ "{:.2f}".format(item[3]) }}</td>
+                <td>{{ "{:.2f}".format(item[4]) }}</td>
+                <td><a href="/removeonefromcart/{{ item[0] }}">X</a></td>
             </tr>
         {% endfor %}
             <tr>

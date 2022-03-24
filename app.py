@@ -104,13 +104,26 @@ def render_cart_page():
             item_details = cur.fetchall()
             item.append(item_details[0][0])
             item.append(item_details[0][1])
+            item.append(item[1] * item[3])
+            total += item[4]
+        con.close()
+        return render_template('cart.html', cart_data=unique_product_ids,
+                               logged_in=is_logged_in(), total=total,
+                               fname=session['fname'])
 
-        query = "DELETE FROM cart where userid=?;"
-        cur.execute(query, (userid,))
+
+@app.route('/removeonefromcart/<product_id>')
+def remove_one(product_id):
+    if is_logged_in():
+        customer_id = session['customer_id']
+        query = "DELETE FROM cart WHERE id = (SELECT min(id) FROM cart WHERE customerid = ? AND productid = ?)"
+        con = create_connection(DATABASE)
+        cur = con.cursor()
+        cur.execute(query, (customer_id, product_id))
         con.commit()
         con.close()
-        send_confirmation(unique_product_ids)
-        return redirect('/?message=Order+complete')
+
+        return redirect("/cart")
 
 
 @app.route('/contact')
